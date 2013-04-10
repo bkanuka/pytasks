@@ -194,8 +194,8 @@ FLAGS = gflags.FLAGS
 # The client_id and client_secret are copied from the API Access tab on
 # the Google APIs Console
 FLOW = OAuth2WebServerFlow(
-    client_id='XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    client_secret=keyring.get_password('XXXXXXX', 'XXXXXXXX'),
+    client_id='319177832423.apps.googleusercontent.com',
+    client_secret='2DqtfiyybzCKvNQDeXtlLsuW',
     scope='https://www.googleapis.com/auth/tasks',
     user_agent='myTasks/v1')
 
@@ -206,7 +206,7 @@ FLAGS.auth_local_webserver = False
 # flow. The Storage object will ensure that if successful the good
 # Credentials will get written back to a file.
 
-taskStore = "/PATH/TO/tasks.dat"
+taskStore = "tasks.dat"
 storage = Storage(taskStore)
 credentials = storage.get()
 if credentials is None or credentials.invalid == True:
@@ -222,10 +222,10 @@ http = credentials.authorize(http)
 # the Google APIs Console
 # to get a developerKey for your own application.
 service = build(serviceName='tasks', version='v1', http=http,
-       developerKey=keyring.get_password('XXXXXXXXX', 'XXXXXXXXX'))
+       developerKey='AIzaSyBoTDj3fTqG1XjuYJ19lA4YDdmvgu9mR58')
+       #developerKey=keyring.get_password('XXXXXXXXX', 'XXXXXXXXX'))
 
-parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", 
-	prog="myTasks v0.3")
+parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="myTasks v0.3")
 
 parser.add_argument('-l', dest="tList", action='store', nargs="*", 
 	help='Lists tasks. For a sinlge list, pass the list name.')
