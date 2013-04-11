@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import ConfigParser
 import argparse
 
 import gflags
@@ -184,6 +185,27 @@ weekdays = {'mon':0, 'tue':1, 'wed':2, 'thu':3, 'fri':4, 'sat':5, 'sun':6, 'mond
 
 todayDate = datetime.date.today()
 
+def ConfigSectionMap(section):
+    dict1 = {}
+    Config = ConfigParser.ConfigParser()
+    try:
+        Config.read('api.cfg')
+    except:
+        print "Cannot read file"
+        return dict1
+    options = Config.options(section)
+    for option in options:
+        try:
+            dict1[option] = Config.get(section, option)
+            if dict1[option] == -1:
+                DebugPrint("skip: %s" % option)
+        except:
+            print("exception on %s!" % option)
+            dict1[option] = None
+    return dict1
+
+#print ConfigSectionMap("API")
+
 FLAGS = gflags.FLAGS
 
 # Set up a Flow object to be used if we need to authenticate. This
@@ -194,10 +216,10 @@ FLAGS = gflags.FLAGS
 # The client_id and client_secret are copied from the API Access tab on
 # the Google APIs Console
 FLOW = OAuth2WebServerFlow(
-    client_id='319177832423.apps.googleusercontent.com',
-    client_secret='2DqtfiyybzCKvNQDeXtlLsuW',
-    scope='https://www.googleapis.com/auth/tasks',
-    user_agent='myTasks/v1')
+    client_id = ConfigSectionMap("API")['clientid'],
+    client_secret = ConfigSectionMap("API")['clientsecret'],
+    scope = 'https://www.googleapis.com/auth/tasks',
+    user_agent = 'myTasks/v1')
 
 # To disable the local server feature, uncomment the following line:
 FLAGS.auth_local_webserver = False
@@ -222,7 +244,7 @@ http = credentials.authorize(http)
 # the Google APIs Console
 # to get a developerKey for your own application.
 service = build(serviceName='tasks', version='v1', http=http,
-       developerKey='AIzaSyBoTDj3fTqG1XjuYJ19lA4YDdmvgu9mR58')
+       developerKey = ConfigSectionMap("API")['developerkey'])
        #developerKey=keyring.get_password('XXXXXXXXX', 'XXXXXXXXX'))
 
 parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="myTasks v0.3")
