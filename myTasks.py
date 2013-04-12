@@ -142,7 +142,8 @@ def newTask(opts, tasklists):
 def clearTask(tasklists):
 	for tasklist in tasklists['items']:
 		listID = tasklist['id']
-		service.tasks().clear(tasklist=listID, body='').execute()
+		#service.tasks().clear(tasklist=listID, body='').execute()
+		service.tasks().clear(tasklist=listID).execute()
 	print 'Cleared.'
 
 def delTask(opts, tasklists):
