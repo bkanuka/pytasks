@@ -82,9 +82,9 @@ def listTasks(listName, tasklists):
 				tasks(listID)
 		
 
-def renameList(opts, tasklists):
-	origList = opts[0]
-	newList = opts[1]
+def renameList(args, tasklists):
+	origList = args[0]
+	newList = args[1]
 	for tasklist in tasklists['items']:
 		if tasklist['title'] == origList:
 			tasklist['title'] = newList
@@ -92,38 +92,38 @@ def renameList(opts, tasklists):
 			print origList+' renamed '+newList
 			break
 
-def delList(opts, tasklists):
-	listName = opts
+def delList(args, tasklists):
+	listName = args
 	for tasklist in tasklists['items']:
 		if tasklist['title'] == listName[0]:
 			service.tasklists().delete(tasklist=tasklist['id']).execute()
 			print listName, " deleted!"
 			break		
 
-def newTask(opts, tasklists):
-	listName = opts[0]
+def newTask(args, tasklists):
+	listName = args[0]
 #	dueDate = ''
-	if len(opts) > 2:
-#		if opts[2] == 'today':
+	if len(args) > 2:
+#		if args[2] == 'today':
 #			dueDate = today.strftime('%Y-%m-%d')
-#		elif opts[2] == 'tomorrow':
+#		elif args[2] == 'tomorrow':
 #			dueDate = tomorrow.strftime('%Y-%m-%d')
-#		elif opts[2] == 'next week':
+#		elif args[2] == 'next week':
 #			dueDate = nextWeek.strftime('%Y-%m-%d')
-#		elif opts[2] == '2 weeks':
+#		elif args[2] == '2 weeks':
 #			dueDate = twoWeeks.strftime('%Y-%m-%d')
-#		elif opts[2] == 'next month':
+#		elif args[2] == 'next month':
 #			dueDate = nextMonth.strftime('%Y-%m-%d')
-#		else: dueDate = opts[2]
+#		else: dueDate = args[2]
 #		convertDue = dueDate+'T12:00:00.000Z'
-		convertDue = dueDate(opts[2])
+		convertDue = dueDate(args[2])
 		task = {
-	 		'title': opts[1], 
+	 		'title': args[1], 
 	 		'due': convertDue,
 			}
 	else:
 		task = {
-			'title': opts[1]
+			'title': args[1]
 			}					
 	listID = None
 	for tasklist in tasklists['items']:
@@ -146,9 +146,9 @@ def clearTask(tasklists):
 		service.tasks().clear(tasklist=listID).execute()
 	print 'Cleared.'
 
-def delTask(opts, tasklists):
-	listName= opts[0]
-	taskNumber = int(opts[1])
+def delTask(args, tasklists):
+	listName= args[0]
+	taskNumber = int(args[1])
     # match list off of list name
 	listID = None
 	for tasklist in tasklists['items']:
@@ -163,9 +163,9 @@ def delTask(opts, tasklists):
 	service.tasks().delete(tasklist=listID, task=taskID).execute()
 	print "Completed."
 
-def updateTask(opts, tasklists):
-	listName = opts[0]
-	taskNumber = int(opts[1])		
+def updateTask(args, tasklists):
+	listName = args[0]
+	taskNumber = int(args[1])		
 	for tasklist in tasklists['items']:
 		if listName == tasklist['title']:
 			listID=tasklist['id']
@@ -179,6 +179,9 @@ def updateTask(opts, tasklists):
 	markIt = service.tasks().update(tasklist=listID, task=chooseTask['id'], body=chooseTask).execute()
 	print "Completed"
 
+def naturalDate(string):
+    '''Takes a string in natural language form and returns a date'''
+    pass
 
 relDays = {'today':today, 'tomorrow':tomorrow, 'nextWeek': nextWeek, 'nextMonth':nextMonth}
 
@@ -205,9 +208,11 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
+
+def validate():
 #print ConfigSectionMap("API")
 
-FLAGS = gflags.FLAGS
+    FLAGS = gflags.FLAGS
 
 # Set up a Flow object to be used if we need to authenticate. This
 # sample uses OAuth 2.0, and we set up the OAuth2WebServerFlow with
@@ -216,87 +221,108 @@ FLAGS = gflags.FLAGS
 # applications
 # The client_id and client_secret are copied from the API Access tab on
 # the Google APIs Console
-FLOW = OAuth2WebServerFlow(
-    client_id = ConfigSectionMap("API")['clientid'],
-    client_secret = ConfigSectionMap("API")['clientsecret'],
-    scope = 'https://www.googleapis.com/auth/tasks',
-    user_agent = 'myTasks/v1')
+    FLOW = OAuth2WebServerFlow(
+        client_id = ConfigSectionMap("API")['clientid'],
+        client_secret = ConfigSectionMap("API")['clientsecret'],
+        scope = 'https://www.googleapis.com/auth/tasks',
+        user_agent = 'pytasks')
 
 # To disable the local server feature, uncomment the following line:
-FLAGS.auth_local_webserver = False
+    FLAGS.auth_local_webserver = False
 
 # If the Credentials don't exist or are invalid, run through the native client
 # flow. The Storage object will ensure that if successful the good
 # Credentials will get written back to a file.
 
-taskStore = "tasks.dat"
-storage = Storage(taskStore)
-credentials = storage.get()
-if credentials is None or credentials.invalid == True:
-  credentials = run(FLOW, storage)
+    taskStore = "tasks.dat"
+    storage = Storage(taskStore)
+    credentials = storage.get()
+    if credentials is None or credentials.invalid == True:
+        try:
+            credentials = run(FLOW, storage)
+        except KeyboardInterrupt:
+            print "Aborting."
 
 # Create an httplib2.Http object to handle our HTTP requests and authorize it
 # with our good Credentials.
-http = httplib2.Http(cache=".cache")
-http = credentials.authorize(http)
+    http = httplib2.Http(cache=".cache")
+    http = credentials.authorize(http)
 
 
 # Build a service object for interacting with the API. Visit
 # the Google APIs Console
 # to get a developerKey for your own application.
-service = build(serviceName='tasks', version='v1', http=http,
-       developerKey = ConfigSectionMap("API")['developerkey'])
-       #developerKey=keyring.get_password('XXXXXXXXX', 'XXXXXXXXX'))
+    service = build(serviceName='tasks', version='v1', http=http,
+           developerKey = ConfigSectionMap("API")['developerkey'])
+           #developerKey=keyring.get_password('XXXXXXXXX', 'XXXXXXXXX'))
 
-parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="myTasks v0.3")
-
-parser.add_argument('-l', dest="tList", action='store', nargs="*", 
-	help='Lists tasks. For a sinlge list, pass the list name.')
-
-parser.add_argument('-n', dest="new", help='Adds new task. Pass the name of the task list and the \
-	new task as arguments in double quotes. For example: tasks -n Main "Add this task to the Main list."', 
-	action='store', metavar='<ListName> <"Task"> <YYYY-MM-DD>', nargs="*")
-
-parser.add_argument('-c', dest="clear", action='store_true', default=False, 
-	help='Clears completed tasks from your lists. Takes no arguments.')
-
-parser.add_argument('-u', dest="update", help='Updates a designated task as completed. Pass the \
-	name of the list and the number of the task. The number is available by first listing tasks \
-	with the -l command. For example: tasks -u Main 1. This command would mark the first message \
-	on the Main list as completed.', action='store', metavar='<ListName> <TaskNumber>', nargs="*")
-
-parser.add_argument('-d', dest="delTask", help='Deletes a designated task. Pass the name of the list and the \
-	number of the task. The number is available by first listing tasks with the -l command. \
-	For example: tasks -d Main 1. This command would delete the first message from the Main list.', 
-	action='store', metavar='<ListName> <TaskNumber>', nargs="*")
-
-parser.add_argument('-R', dest="newList", help='Renames a task list. Pass the old list name and the \
-	new list name. For example: tasks -R Main Home. This command would rename the Main list as the Home \
-	list.', action='store', metavar='<old ListName> <new ListName>', nargs=2)
-
-parser.add_argument('-D', dest="delList", help='Delete a task list. Pass the targeted list name. \
-	For example: tasks -D Main. This command would delete the Main task list.', action='store', 
-	metavar='<target listName>', nargs=1)
+if __name__ == "__main__":
+    # validate_cfg()
+    # authorize_connection()
 
 
-tasklists = service.tasklists().list().execute()
-opts = parser.parse_args()
+    parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="pytasks")
+
+    parser.add_argument('-l', '--list', 
+        help='Lists tasks. For a sinlge list, pass the list name.', nargs='*')
+
+    parser.add_argument('-c', '--complete', 
+        help='Marks a task as completed. Pass the \
+        name of the list and the number of the task. The number is available by first listing tasks \
+        with the -l command. For example: tasks -u Main 1. This command would mark the first message \
+        on the Main list as completed.', metavar='[ListName] <TaskNumber>', nargs='*')
+
+    parser.add_argument('-a', '--add', help='Adds new task. Pass the name of the task list and the \
+        new task as arguments in double quotes. For example: tasks -n Main "Add this task to the Main list."', 
+        action='store', metavar='<"Task"> [-l ListName] [-d date]', nargs='*')
+
+    parser.add_argument('-d', '--delete', help='Deletes a designated task. Pass the name of the list and the \
+        number of the task. The number is available by first listing tasks with the -l command. \
+        For example: tasks -d Main 1. This command would delete the first message from the Main list.', 
+        action='store', metavar='[ListName] <TaskNumber>', nargs="*")
+
+    #parser.add_argument('-d', '--delete', help='Deletes a designated task. Pass the name of the list and the \
+    #    number of the task. The number is available by first listing tasks with the -l command. \
+    #    For example: tasks -d Main 1. This command would delete the first message from the Main list.', 
+    #    action='store', metavar='[ListName] <TaskNumber>', nargs="*")
+
+    parser.add_argument('-L', '--List', action='store', nargs='?', 
+        help='Lists task lists.')
+
+    parser.add_argument('-C', dest="clear", action='store_true', default=False, 
+        help='Clears completed tasks from your lists. Optionally from a single list.')
+    
+    parser.add_argument('-R', dest="renameList", help='Renames a task list. Pass the old list name and the \
+        new list name. For example: tasks -R Main Home. This command would rename the Main list as the Home \
+        list.', action='store', metavar='<old ListName> <new ListName>', nargs=2)
+
+    parser.add_argument('-N', dest="newList", help='Create new task list.', 
+            action='store', metavar='<new ListName>', nargs=2)
+
+    parser.add_argument('-D', dest="delList", help='Delete a task list. Pass the targeted list name. \
+        For example: tasks -D Main. This command would delete the Main task list.', action='store', 
+        metavar='<target listName>', nargs=1)
 
 
-if opts.new != None:
-	newTask(opts.new, tasklists)
-elif opts.clear == True:
-	clearTask(tasklists)
-elif opts.update != None:
-	updateTask(opts.update, tasklists)
-elif opts.delTask != None: 
-	delTask(opts.delTask, tasklists)
-elif opts.newList != None:
-	renameList(opts.newList, tasklists)
-elif opts.delList != None:
-	delList(opts.delList, tasklists)
-elif opts.tList != None: 
-	listTasks(opts.tList, tasklists)
+    #tasklists = service.tasklists().list().execute()
+    args = parser.parse_args()
+    print args
+
+
+    if args.new != None:
+        newTask(args.new, tasklists)
+    elif args.clear == True:
+        clearTask(tasklists)
+    elif args.update != None:
+        updateTask(args.update, tasklists)
+    elif args.delTask != None: 
+        delTask(args.delTask, tasklists)
+    elif args.newList != None:
+        renameList(args.newList, tasklists)
+    elif args.delList != None:
+        delList(args.delList, tasklists)
+    elif args.tList != None: 
+        listTasks(args.tList, tasklists)
 
 
 
