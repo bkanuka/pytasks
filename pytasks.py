@@ -260,6 +260,16 @@ if __name__ == "__main__":
     # validate_cfg()
     # authorize_connection()
 
+#           Running the program with no arguments should list tasks form all task lists
+# -l        list a single task list
+# -a/-n     add a task to "Main"
+# -a -l     add a task to specific list
+# -x        toggle mark task as completed
+# -x -l     toggle mark task as completed (search within single list)
+# -d [-l]   delete task
+# -C [-l]   Clear completed tasks
+# -A/-N     add new task list
+# -D        delete task list
 
     parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="pytasks")
 
