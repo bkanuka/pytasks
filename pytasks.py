@@ -262,56 +262,44 @@ if __name__ == "__main__":
 
 #           Running the program with no arguments should list tasks form all task lists
 # -l        list a single task list
-# -a/-n     add a task to "Main"
+# -a     add a task to "Main"
 # -a -l     add a task to specific list
 # -x        toggle mark task as completed
 # -x -l     toggle mark task as completed (search within single list)
 # -d [-l]   delete task
 # -C [-l]   Clear completed tasks
-# -A/-N     add new task list
+# -A     add new task list
 # -D        delete task list
 
     parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="pytasks")
 
-    parser.add_argument('-l', '--list', 
-        help='Lists tasks. For a sinlge list, pass the list name.', nargs='*')
+    parser.add_argument('-l', '--list', nargs='*', 
+            help='Lists tasks. For a sinlge list, pass the list name.')
 
-    parser.add_argument('-c', '--complete', 
-        help='Marks a task as completed. Pass the \
-        name of the list and the number of the task. The number is available by first listing tasks \
-        with the -l command. For example: tasks -u Main 1. This command would mark the first message \
-        on the Main list as completed.', metavar='[ListName] <TaskNumber>', nargs='*')
+    parser.add_argument('-a', '--add', nargs='+', 
+            help='Adds new task.')
 
-    parser.add_argument('-a', '--add', help='Adds new task. Pass the name of the task list and the \
-        new task as arguments in double quotes. For example: tasks -n Main "Add this task to the Main list."', 
-        action='store', metavar='<"Task"> [-l ListName] [-d date]', nargs='*')
+    parser.add_argument('-x', '--complete', nargs='+',
+            help='Marks a task as completed. Pass the \
+            name of the list and the number of the task. The number is available by first listing tasks \
+            with the -l command. For example: tasks -u Main 1. This command would mark the first message \
+            on the Main list as completed.')
 
-    parser.add_argument('-d', '--delete', help='Deletes a designated task. Pass the name of the list and the \
-        number of the task. The number is available by first listing tasks with the -l command. \
-        For example: tasks -d Main 1. This command would delete the first message from the Main list.', 
-        action='store', metavar='[ListName] <TaskNumber>', nargs="*")
+    parser.add_argument('-d', '--delete', nargs='+', 
+            help='Deletes a designated task.')
 
-    #parser.add_argument('-d', '--delete', help='Deletes a designated task. Pass the name of the list and the \
-    #    number of the task. The number is available by first listing tasks with the -l command. \
-    #    For example: tasks -d Main 1. This command would delete the first message from the Main list.', 
-    #    action='store', metavar='[ListName] <TaskNumber>', nargs="*")
-
-    parser.add_argument('-L', '--List', action='store', nargs='?', 
-        help='Lists task lists.')
-
-    parser.add_argument('-C', dest="clear", action='store_true', default=False, 
-        help='Clears completed tasks from your lists. Optionally from a single list.')
     
-    parser.add_argument('-R', dest="renameList", help='Renames a task list. Pass the old list name and the \
-        new list name. For example: tasks -R Main Home. This command would rename the Main list as the Home \
-        list.', action='store', metavar='<old ListName> <new ListName>', nargs=2)
+    parser.add_argument('-L', '--List', nargs='*', 
+            help='Lists task lists.')
 
-    parser.add_argument('-N', dest="newList", help='Create new task list.', 
-            action='store', metavar='<new ListName>', nargs=2)
+    parser.add_argument('-C', '--clear', nargs='?', const=True, default=False,
+            help='Clears completed tasks from your lists. Optionally from a single list.')
+    
+    parser.add_argument('-A', '--New', nargs='+', 
+            help='Create new task list.') 
 
-    parser.add_argument('-D', dest="delList", help='Delete a task list. Pass the targeted list name. \
-        For example: tasks -D Main. This command would delete the Main task list.', action='store', 
-        metavar='<target listName>', nargs=1)
+    parser.add_argument('-D', '--Delete', nargs='+',
+            help='Delete a task list.')
 
 
     #tasklists = service.tasklists().list().execute()
