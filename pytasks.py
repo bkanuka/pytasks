@@ -273,54 +273,62 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="pytasks")
 
-    parser.add_argument('-l', '--list', nargs='*', 
+    parser.add_argument('-l', '--list', nargs='*', action='append',
             help='Lists tasks. For a sinlge list, pass the list name.')
 
-    parser.add_argument('-a', '--add', nargs='+', 
+    parser.add_argument('-a', '--add', nargs='+',  action='append',
             help='Adds new task.')
 
-    parser.add_argument('-x', '--complete', nargs='+',
+    parser.add_argument('-x', '--complete', nargs='+', action='append',
             help='Marks a task as completed. Pass the \
             name of the list and the number of the task. The number is available by first listing tasks \
             with the -l command. For example: tasks -u Main 1. This command would mark the first message \
             on the Main list as completed.')
 
-    parser.add_argument('-d', '--delete', nargs='+', 
+    parser.add_argument('-d', '--delete', nargs='+', action='append', 
             help='Deletes a designated task.')
 
     
-    parser.add_argument('-L', '--List', nargs='*', 
+    parser.add_argument('-L', '--List', nargs='*', action='append', 
             help='Lists task lists.')
 
-    parser.add_argument('-C', '--clear', nargs='?', const=True, default=False,
+    parser.add_argument('-C', '--clear', nargs='?', action='append', const=True, default=False,
             help='Clears completed tasks from your lists. Optionally from a single list.')
     
-    parser.add_argument('-A', '--New', nargs='+', 
+    parser.add_argument('-A', '--New', nargs='+', action='append', 
             help='Create new task list.') 
 
-    parser.add_argument('-D', '--Delete', nargs='+',
+    parser.add_argument('-D', '--Delete', nargs='+', action='append',
             help='Delete a task list.')
 
 
     #tasklists = service.tasklists().list().execute()
     args = parser.parse_args()
-    print args
+    args = vars(args)
+    
+    for key in args:
+        try:
+            args[key] = [' '.join(x) for x in args[key]]
+        except:
+            pass
 
+#    if args['add']:
+#       add_tasks(args['add'], args['list'])
 
-    if args.new != None:
-        newTask(args.new, tasklists)
-    elif args.clear == True:
-        clearTask(tasklists)
-    elif args.update != None:
-        updateTask(args.update, tasklists)
-    elif args.delTask != None: 
-        delTask(args.delTask, tasklists)
-    elif args.newList != None:
-        renameList(args.newList, tasklists)
-    elif args.delList != None:
-        delList(args.delList, tasklists)
-    elif args.tList != None: 
-        listTasks(args.tList, tasklists)
+#    if args.new != None:
+#        newTask(args.new, tasklists)
+#    elif args.clear == True:
+#        clearTask(tasklists)
+#    elif args.update != None:
+#        updateTask(args.update, tasklists)
+#    elif args.delTask != None: 
+#        delTask(args.delTask, tasklists)
+#    elif args.newList != None:
+#        renameList(args.newList, tasklists)
+#    elif args.delList != None:
+#        delList(args.delList, tasklists)
+#    elif args.tList != None: 
+#        listTasks(args.tList, tasklists)
 
 
 
