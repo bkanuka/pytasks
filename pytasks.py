@@ -263,6 +263,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(usage="tasks [option] arg1 arg2 arg3", prog="pytasks")
 
+# without any arguments should list tasks
+# task and list name should be by number _or_ fuzzy
+
     parser.add_argument('-l', '--list', 
         help='Lists tasks. For a sinlge list, pass the list name.', nargs='*')
 
@@ -270,7 +273,7 @@ if __name__ == "__main__":
         help='Marks a task as completed. Pass the \
         name of the list and the number of the task. The number is available by first listing tasks \
         with the -l command. For example: tasks -u Main 1. This command would mark the first message \
-        on the Main list as completed.', metavar='[ListName] <TaskNumber>', nargs='*')
+        on the Main list as completed.', metavar='<"Task"> [-l ListName]', nargs='*')
 
     parser.add_argument('-a', '--add', help='Adds new task. Pass the name of the task list and the \
         new task as arguments in double quotes. For example: tasks -n Main "Add this task to the Main list."', 
@@ -279,7 +282,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--delete', help='Deletes a designated task. Pass the name of the list and the \
         number of the task. The number is available by first listing tasks with the -l command. \
         For example: tasks -d Main 1. This command would delete the first message from the Main list.', 
-        action='store', metavar='[ListName] <TaskNumber>', nargs="*")
+        action='store', metavar='<"Task"> [-l ListName]', nargs="*")
 
     #parser.add_argument('-d', '--delete', help='Deletes a designated task. Pass the name of the list and the \
     #    number of the task. The number is available by first listing tasks with the -l command. \
